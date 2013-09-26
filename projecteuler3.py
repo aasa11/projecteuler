@@ -216,12 +216,240 @@ def q36():
     print proc
     print sum(v for v in proc)
 
+def is_mvinlst(x, primes):
+    v = str(x)
+    for i in xrange(1,len(v)):
+        if int(v[i:]) not in primes:
+            return False
+        if int(v[0:len(v)-i]) not in primes:
+            return False
+    return True
+
+def q37():
+    primes = [2,3,5,7]
+    ans = []
+    x = 11
+    while True:
+        if is_prime(x):
+            primes.append(x)
+            
+            if is_mvinlst(x, primes):
+                ans.append(x)
+                print x
+            if len(ans) >= 11:
+                break
+        x += 1
+    print ans
+    print sum(x for x in ans)
+
+def is_pandigital2(strv):
+    if len(strv) <> 9:
+        return False
+    lst = sorted([int(v) for v in strv])
+    if lst <>[1,2,3,4,5,6,7,8,9]:
+        return False
+    return True
+
+def q38():
+    maxv = 0 
+    maxx = 0
+    maxn = 0
+    for x in xrange(1,10000000):
+        strv = ""
+        i = 1
+        while True:
+            strv += str(i*x)
+            if len(strv) >= 9:
+                break
+            i += 1
+        if is_pandigital2(strv):
+            if int(strv)> maxv:
+                maxv = int(strv)
+                maxx = x
+                maxn = i
+                print maxv, maxx, maxn 
+    print maxv, maxx, maxn 
+    
+def q39():
+    maxcnt = 0
+    maxp = 0
+    for p in xrange(10,1001):
+        lstv = []
+        for a in xrange(1,int(p/2)):
+            for b in xrange(a+1, p-a):
+                if (p-a-b)**2 == a**2 + b**2:
+                    l = sorted([a,b,p-a-b])
+                    dt = 1000*1000*l[0]+1000*l[1]+l[2]
+                    lstv.append(dt)
+                    break
+                elif (p-a-b)**2 < a**2 + b**2:
+                    break
+        if len(lstv) <= 0:
+            continue
+        print lstv
+        cnt = len(set(lstv))
+        if cnt > maxcnt:
+            maxcnt = cnt
+            maxp = p
+            print maxcnt, maxp
+    print maxcnt, maxp
+                
+
+def q40():
+    i = 1
+    cnt = 0
+    idx = 1
+    lst = []
+    while True:
+        strv = str(i)
+        l = len(strv)
+        while l+cnt >= idx:
+            lst.append(strv[idx-cnt-1])
+            idx *= 10
+        cnt += l
+        if idx > 1000000:
+            break
+        i += 1
+    print lst
+    proc = 1
+    for v in lst:
+        proc *= int(v)
+    print proc
+    
+def is_pandigital3(x):
+    strv = str(x)
+    lst = sorted([int(v) for v in strv])
+    if lst == range(1,len(strv)+1):
+        return True
+    return False    
+
+def get_pandigitalrev(lst):
+    for idx, v in enumerate(lst):
+        if len(lst) == 1:
+            yield lst
+        else:
+            lst2 = lst[0:idx]+lst[idx+1:]
+            #print lst2
+            for l in get_pandigitalrev(lst2):
+                lst3 = [v] + l
+                yield lst3
+    
+def q41():
+    for n in xrange(9,1,-1):
+        lst = range(n,0,-1)
+        for l in get_pandigitalrev(lst):
+            print l
+            strv = ''
+            if l is None:
+                continue
+            for v in l:
+                strv += str(v)
+            if is_prime(int(strv)):
+                print l
+                return
+
+def cal_trnum(strv):
+    s = 0
+    for v in strv:
+        s += ord(v)-ord('A')+1
+    return s
+
+
+def q42():
+    filename = r'res/words.txt'
+    f = open(filename, 'r')
+    ws = f.read()
+    f.close()
+    lst = ws.split(',')
+    print lst
+    lst2 = []
+    for v in lst:
+        lst2.append(v[1:-1])
+    print lst2
+
+    trlst = []
+    for i in xrange(1,100,1):
+        trlst.append(i*(i+1)/2)
+    print trlst
+    cnt = 0
+    for v in lst2:
+        if cal_trnum(v) in trlst:
+            print v
+            cnt +=1
+    print cnt
+
+def q43():
+    lst = range(0,10)
+    primelst = [2,3,5,7,11,13,17]
+    s = 0
+    for l in get_pandigitalrev(lst):
+        if l[0] == '0':
+            continue
+        isok = True
+        for i in xrange(7):
+            strv = ''
+            for x in xrange(1,4):
+                strv += str(l[x+i])
+            if int(strv) % primelst[i] <> 0:
+                isok = False
+                break
+        if isok:
+            strv = ''
+            for v in l:
+                strv += str(v)
+            s += int(strv)
+            print strv
+            
+    print s
+    
+
+def q44():
+    lst = [2,10,24,44]
+    j = 3
+    while True:
+        lens = len(lst)
+        if j > lens-1:
+            for p in xrange(lens+1, 2*lens):
+                lst.append(p*(3*p-1))
+            print lst
+        for i in xrange(j-1,(j/2), -1):
+            if lst[j]-lst[i] in lst:
+                v = lst[j]-lst[i]
+                print v, lst[i], lst[j]
+                if lst[i]-v in lst:
+                    print (lst[i]-v)/2
+                    return
+        j += 1
+
+def q45():
+    maxx = 100000
+    lst1 = []
+    dict2 = {}
+    dict3 = {}
+    for n in xrange(1, maxx):
+        lst1.append(n*n+n)
+        dict2[3*n*n-n] = 0
+        dict3[4*n*n-2*n] = 0
+    
+    sums = 0
+    j = 0
+    for j in xrange(1, maxx-1):
+        if lst1[j] in  dict2 :
+            print lst1[j], j
+            if lst1[j] in dict3:
+                sums += 1
+                print "ok", (lst1[j])/2, j
+        if sums >= 3:
+            print "find"
+            break
+
+
 def qq():
     pass
 #----------------------It is a split line--------------------------------------
 
 def main():
-    q36()
+    q45()
     
 #----------------------It is a split line--------------------------------------
 
